@@ -30,6 +30,8 @@ void Robot::RobotInit()
   //climber->climberInit(); 
   setZero = drivetrain->GetHeading();  
   drivetrain->AutonomousInit();
+  drivetrain->zeroOutLeftEncoder(); 
+  drivetrain->zeroOutRightEncoder();
 
 }
  
@@ -58,8 +60,8 @@ void Robot::RobotPeriodic()
   frc::SmartDashboard::PutNumber("Right joystick input", oi->getRightStick());
   frc::SmartDashboard::PutNumber("Left Drive Encoder", drivetrain->getLeftDrivetrainEncoder());
   frc::SmartDashboard::PutNumber("Right Drive Encoder", drivetrain->getRightDrivetrainEncoder());
-  std::cout << "Right Drive Encoder: " << drivetrain->getRightDrivetrainEncoder() << std::endl;
-  std::cout << "Left Drive Encoder: " << drivetrain->getLeftDrivetrainEncoder() << std::endl;
+  //std::cout << "Right Drive Encoder: " << drivetrain->getRightDrivetrainEncoder() << std::endl;
+  //std::cout << "Left Drive Encoder: " << drivetrain->getLeftDrivetrainEncoder() << std::endl;
 
   frc::SmartDashboard::PutBoolean("LT pressed", oi->isleftTriggerPressed());
   frc::SmartDashboard::PutBoolean("RT pressed", oi->isRightTriggerPressed());
@@ -102,14 +104,38 @@ void Robot::AutonomousInit()
   autoWaitTime = 275;
   setZero = drivetrain->GetHeading();
   drivetrain->AutonomousInit();
+  
+  isFirstTurn = true;
+  isFirstTurnFinished = false; 
+  isSecondTurn = true; 
+  isSecondTurnFinished = false; 
+  isThirdTurn = true; 
+  isThirdTurnFinsihed = false; 
+  isFourthTurn = true; 
+  isFourthTurnFinished = false; 
+  rightEncoderValue_firstTurn = 0;
+  rightEncoderValue_initial = 0;
+  leftEncoderValue_initial = 0;
+  rightEncoderValue_firstTurn = 0; 
+  leftEncoderValue_firstTurn = 0;
+  leftEncoderValue_firstTurnFinished = 0;  
+  rightEncoderValue_secondTurn = 0; 
+  rightEncoderValue_secondTurnFinished = 0; 
+  leftEncoderValue_secondTurn = 0; 
+  leftEncoderValue_secondTurnFinished = 0; 
+  rightEncoderValue_thridTurn = 0; 
+  rightEncoderValue_thirdTurnFinished = 0; 
+  leftEncoderValue_thirdTurn = 0; 
+  leftEncoderValue_thirdTurnFinished = 0; 
+  startAuto = false; 
+
 
   /*if(isInitial){
     rightEncoderValue_initial = drivetrain->getRightDrivetrainEncoder(); 
     leftEncoderValue_initial = drivetrain->getLeftDrivetrainEncoder(); 
     isInitial = false;
 }*/
-    rightEncoderValue_initial = drivetrain->getRightDrivetrainEncoder(); 
-    leftEncoderValue_initial = drivetrain->getLeftDrivetrainEncoder(); 
+   
 /*
   m_autoSelected = m_chooser.GetSelected();
   autoPathDirections.clear();
@@ -162,67 +188,109 @@ void Robot::AutonomousPeriodic()
 //}  
 rightEncoderValue = drivetrain->getRightDrivetrainEncoder(); 
 leftEncoderValue = drivetrain->getLeftDrivetrainEncoder(); 
+std::cout << leftEncoderValue << " " << rightEncoderValue << std::endl;
+if (leftEncoderValue < 0.1 && leftEncoderValue >= 0)
+{
+   startAuto = true;
+   rightEncoderValue_initial = drivetrain->getRightDrivetrainEncoder(); 
+   leftEncoderValue_initial = drivetrain->getLeftDrivetrainEncoder(); 
+}
 
-/*if(leftEncoderValue <= (leftEncoderValue_initial + 60)){
-  drivetrain->tankDrive(0.3, 0.3);
-  std::cout << "cout 1: " << leftEncoderValue_initial + 50 << " " << leftEncoderValue << std::endl; 
-} else{
-  std::cout << "cout 2: " << std::endl; 
-  if(isFirstTurn){
-    rightEncoderValue_firstTurn = drivetrain->getRightDrivetrainEncoder(); 
-    leftEncoderValue_firstTurn = drivetrain->getLeftDrivetrainEncoder();
-    isFirstTurn = false; 
-  }
-  if(isFirstTurnFinished == false){
-      drivetrain->tankDrive(0.3, 0.1);
-  }
-  if(leftEncoderValue >= leftEncoderValue_firstTurn + 180){
-    if(isFirstTurnFinished == false){
-      leftEncoderValue_firstTurnFinished = drivetrain->getLeftDrivetrainEncoder(); 
-      isFirstTurnFinished = true;
+
+if(startAuto == true)
+{
+  if(leftEncoderValue <= (leftEncoderValue_initial + 60))
+  {
+    drivetrain->tankDrive(0.3, 0.3);
+    std::cout << "cout 1: " << leftEncoderValue_initial + 50 << " " << leftEncoderValue << std::endl; 
+  } 
+  else
+  {
+    std::cout << "cout 2: " << std::endl; 
+    if(isFirstTurn)
+    {
+      rightEncoderValue_firstTurn = drivetrain->getRightDrivetrainEncoder(); 
+      leftEncoderValue_firstTurn = drivetrain->getLeftDrivetrainEncoder();
+      isFirstTurn = false; 
     }
-    std::cout << "cout 3" << std::endl; 
-    if(leftEncoderValue <= leftEncoderValue_firstTurnFinished + 65){
-      std::cout << "cout 4" << std::endl;
-       drivetrain->tankDrive(0.3, 0.3); 
-    } else{
-      std::cout << "cout 5" << std::endl;
-      if(isSecondTurn){
-        rightEncoderValue_secondTurn = drivetrain->getRightDrivetrainEncoder(); 
-        isSecondTurn = false; 
+    if(isFirstTurnFinished == false)
+    {
+      drivetrain->tankDrive(0.3, 0.1);
+    }
+    if(leftEncoderValue >= leftEncoderValue_firstTurn + 178)
+    {
+      if(isFirstTurnFinished == false)
+      {
+        leftEncoderValue_firstTurnFinished = drivetrain->getLeftDrivetrainEncoder(); 
+        isFirstTurnFinished = true;
+      }
+      std::cout << "cout 3" << std::endl; 
+      if(leftEncoderValue <= leftEncoderValue_firstTurnFinished + 65)
+      {
+        std::cout << "cout 4" << std::endl;
+        drivetrain->tankDrive(0.3, 0.3); 
       } 
-      if(isSecondTurnFinished == false){
+      else
+      {
+        std::cout << "cout 5" << std::endl;
+        if(isSecondTurn)
+        {
+          rightEncoderValue_secondTurn = drivetrain->getRightDrivetrainEncoder(); 
+          isSecondTurn = false; 
+        } 
+        if(isSecondTurnFinished == false)
+        {
           drivetrain->tankDrive(0.1, 0.3); 
-      }
-      if(rightEncoderValue >= rightEncoderValue_secondTurn + 139){
-        if(isSecondTurnFinished == false){
-          isSecondTurnFinished = true; 
-          rightEncoderValue_secondTurnFinished = drivetrain->getRightDrivetrainEncoder(); 
         }
-        if(rightEncoderValue <= rightEncoderValue_secondTurnFinished + 53){
-          drivetrain->tankDrive(0.3, 0.3);
-        } else{
-          if(isThirdTurn){
-            isThirdTurn = false; 
-            rightEncoderValue_thridTurn = drivetrain->getRightDrivetrainEncoder(); 
+        if(rightEncoderValue >= rightEncoderValue_secondTurn + 143)
+        {
+          if(isSecondTurnFinished == false)
+          {
+            isSecondTurnFinished = true; 
+            rightEncoderValue_secondTurnFinished = drivetrain->getRightDrivetrainEncoder(); 
           }
-          if(isThirdTurnFinsihed == false){
-            drivetrain->tankDrive(0.1, 0.3); 
-          }
-          if(rightEncoderValue >= rightEncoderValue_thridTurn + 95.5){
-            if(isThirdTurnFinsihed == false){
-              isThirdTurnFinsihed = true; 
-              rightEncoderValue_thirdTurnFinished = drivetrain->getRightDrivetrainEncoder(); 
+          if(rightEncoderValue <= rightEncoderValue_secondTurnFinished + 55)
+            { //53
+            drivetrain->tankDrive(0.3, 0.3);
+            } 
+          else
+            {
+            if(isThirdTurn)
+            {
+              isThirdTurn = false; 
+              rightEncoderValue_thridTurn = drivetrain->getRightDrivetrainEncoder(); 
             }
-            if(rightEncoderValue <= rightEncoderValue_thirdTurnFinished + 155){
-              drivetrain->tankDrive(0.3, 0.3); 
-            } else{
-              drivetrain->tankDrive(0, 0); 
+            if(isThirdTurnFinsihed == false)
+            {
+              drivetrain->tankDrive(0.1, 0.3); 
+            }
+          if(rightEncoderValue >= rightEncoderValue_thridTurn + 100)
+            { //95.5
+              if(isThirdTurnFinsihed == false)
+              {
+                isThirdTurnFinsihed = true; 
+                rightEncoderValue_thirdTurnFinished = drivetrain->getRightDrivetrainEncoder(); 
+              }
+  
+              if(rightEncoderValue <= rightEncoderValue_thirdTurnFinished + 170)
+              {
+                drivetrain->tankDrive(0.3, 0.3025); 
+              } 
+              else
+              {
+                drivetrain->tankDrive(0, 0); 
 
-            }
+              }
+            } 
+            } 
           }
         }
-      }
+    }
+  }
+}
+}
+
+      /*
       rightEncoderValue_secondTurn = drivetrain->getRightDrivetrainEncoder(); 
       leftEncoderValue_secondTurn = drivetrain->getLeftDrivetrainEncoder(); 
       if(leftEncoderValue == leftEncoderValue_secondTurn){
@@ -230,9 +298,9 @@ leftEncoderValue = drivetrain->getLeftDrivetrainEncoder();
       }
     }
   }
-}*/
+} */
 
-    
+  /*  
 if(rightEncoderValue <= rightEncoderValue_initial + 10){
   drivetrain->tankDrive(0.3, 0.3); 
 } else{
@@ -272,13 +340,12 @@ if(rightEncoderValue <= rightEncoderValue_initial + 10){
             }
           }
         }
-
         
       }
     }   
-  }
-}
-}
+  } */
+ //ends (if startAuto)
+ //class closer 
 
 
 
@@ -329,6 +396,8 @@ void Robot::TeleopInit()
     okToLock = false;
     led->Standard();
     setZero = drivetrain->GetHeading();
+    drivetrain->zeroOutRightEncoder(); 
+    drivetrain->zeroOutLeftEncoder(); 
 
 }
 
@@ -343,11 +412,14 @@ void Robot::TeleopPeriodic()
   okRightDown = true;
   calibrateShooter = false;
 
+  rightEncoderValue = drivetrain->getRightDrivetrainEncoder(); 
+  leftEncoderValue = drivetrain->getLeftDrivetrainEncoder(); 
 
   rightClimbValue = climber->getRightEncoder();
   leftClimbValue = climber->getLeftEncoder();
   shooter->sensorFlip();
 
+  std::cout << leftEncoderValue << " " << rightEncoderValue << std::endl; 
 
   //Controls so far including limelight track
  /*   if (oi->isRightTriggerPressed() == true) 

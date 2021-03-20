@@ -136,7 +136,7 @@ class Robot : public frc::TimedRobot {
   bool isThirdTurnFinsihed = false; 
   bool isFourthTurn = true; 
   bool isFourthTurnFinished = false; 
-  
+  bool startAuto;
 //Auto paths 
   int path_count = 0;
   double leftClimbValue; 

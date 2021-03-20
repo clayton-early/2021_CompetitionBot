@@ -145,6 +145,11 @@ void Drivetrain::Get_Trajectory_JSON_File(std::string name)
 void Drivetrain::AutonomousInit() 
 { 
     navX->ZeroYaw(); 
+    zeroOutLeftEncoder(); 
+    std::cout << leftDrive_encoder->GetPosition() << "autoinit" << std::endl;
+    
+    zeroOutRightEncoder();
+    
 }
 
 
